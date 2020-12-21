@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	
+	<!-- 配置扫描器 --> 
+	<context:component-scan base-package="org.ruangong.dao,org.ruangong.entity,org.ruangong.aop"></context:component-scan>
+	
+	<!-- 数据库配置 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql://localhost:3306/student?characterEncoding=UTF-8"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="893225523"></property>
+		<property name="maxActive" value="10"></property>	
+		<property name="maxIdle" value="6"></property>		
+	</bean>
+	
+	<!-- 配置事务管理器txManager -->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!-- 增加对事务的支持 -->
+	<tx:annotation-driven transaction-manager="txManager"/>
+	<!-- 开启注解对AOP的支持 -->
+	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+	<!-- <bean id="student" class="org.ruangong.entity.Student">
+		<property name="stuNo" value="20173681"></property>
+		<property name="stuName" value="靳晨晨"></property>
+		<property name="stuAge" value="21"></property>
+	</bean> -->
+
+	<bean id="JavaCourse" class="org.ruangong.newinstance.JavaCourse"></bean>
+	<bean id="HtmlCourse" class="org.ruangong.newinstance.HtmlCourse"></bean>
+	
+	<bean id="teacher" class="org.ruangong.entity.Teacher" p:name="刘立嘉" p:age="60">
+	<!-- 通过set注入 -->
+		<!-- <property name="name" value="王建民"></property>
+		<property name="age" value="50"></property>	 -->
+	<!-- 通过构造器注入 -->
+		<!-- <constructor-arg value="刘丹"></constructor-arg>
+		<constructor-arg value="48"></constructor-arg> -->
+		
+	</bean>
+	<bean id="course" class="org.ruangong.entity.Course" p:cname="统一建模" p:chour="6" p:teacher-ref="teacher">
+	<!-- 通过set注入 -->
+		<!-- <property name="cname" value="java"></property>
+		<property name="chour" value="2"></property>		
+		<property name="teacher" ref="teacher"></property> -->
+	<!-- 通过构造器注入 -->
+		<!-- <constructor-arg value="PHP"></constructor-arg>
+		<constructor-arg value="5"></constructor-arg>
+		<constructor-arg ref="teacher"></constructor-arg> -->
+			
+	</bean>
+	
+	<bean id="collection" class="org.ruangong.entity.AllCollectionType">
+	<!-- 通过set方式赋值 -->
+	<property name="list">
+		<list>
+			<value>篮球</value>
+			<value>足球</value>
+			<value>乒乓球</value>
+		</list>
+	</property>
+	<property name="array">
+		<array>
+			<value>篮球_array</value>
+			<value>足球_array</value>	
+			<value>乒乓球_array</value>	
+		</array>
+	</property>
+	<property name="map">
+			<map>
+				<entry>
+					<key>
+					 	<value>
+					 	foot
+					 	</value>
+					</key>
+					<value>足球</value>
+					</entry>
+					<entry>
+					<key>
+					 	<value>
+					 	basket
+					 	</value>
+					</key>
+					<value>篮球球</value>
+					</entry>
+					<entry>
+					<key>
+					 	<value>
+					 	pingpang
+					 	</value>
+					</key>
+					<value>足球</value>
+				</entry>
+			</map>
+	</property>
+	<property name="set">
+		<set>
+			<value>篮球_set</value>
+			<value>足球_set</value>	
+			<value>乒乓球_set</value>	
+		</set>
+	</property>
+	<property name="props">
+		<props>
+			<prop key="foot4">足球</prop>
+			<prop key="basket4">篮球</prop>		
+			<prop key="pp4">乒乓球</prop>
+		</props>
+	</property>
+	</bean>
+	<!-- 自动装配 -->
+	<bean id="course1" class="org.ruangong.entity.Course" autowire="byName">
+		<property name="cname" value="java"></property>
+		<property name="chour" value="2"></property>
+	</bean>
+	
+	
+	
+	<!-- 前置通知 -->
+	<bean id="studentDao" class="org.ruangong.dao.impl.StudentDaoImpl"></bean>
+	
+	
+	<bean id="studentService" class="org.ruangong.service.impl.StudentServiceImpl">
+		<property name="studentDao" ref="studentDao"></property>
+	</bean>
+	<!-- 通知类 -->
+	<!-- 前置通知 -->
+	<bean id="logBefore" class="org.ruangong.aop.LogBefore"></bean>
+	<!-- 后置通知 -->
+	<bean id="logAfter" class="org.ruangong.aop.LogAfter"></bean>
+	<!-- 异常通知 -->
+	<bean id="logExecption" class="org.ruangong.aop.LogExecption"></bean>
+	<!-- 环绕通知 -->
+	<bean id="logAround" class="org.ruangong.aop.LogAround"></bean>
+	<!-- Schema实现通知 -->
+	<bean id="logSchema" class="org.ruangong.aop.LogSchema"></bean>
+		
+	<aop:config>
+		<aop:pointcut expression="execution(public void org.ruangong.service.impl.StudentServiceImpl.addStudent(org.ruangong.entity.Student))" id="pcSchema"/>
+		<!-- <aop:advisor advice-ref="logSchema" pointcut-ref="pcSchema"/> -->
+		<!-- Schema方式 -->
+		<aop:aspect ref="logSchema">
+			<aop:before method="before" pointcut-ref="pcSchema"/>
+			<aop:after-returning method="afterReturning" returning="returnValue" pointcut-ref="pcSchema"/>
+			<aop:after-throwing method="whenException" throwing="e" pointcut-ref="pcSchema"/>
+			<!-- 环绕通知 -->
+			<aop:around method="around" pointcut-ref="pcSchema"/>
+		</aop:aspect>
+	</aop:config>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- 将addStudent()和通知进行关联 -->
+	<aop:config>
+	<!-- 配置切入点，在哪里执行通知 -->
+		<aop:pointcut expression="execution(public void org.ruangong.service.impl.StudentServiceImpl.deleteStudentByNo(int)) or execution(public void org.ruangong.service.StudentServiceImpl.addStudent(org.ruangong.entity.Student))" id="pointcut"/>
+		<!-- 相当于连接切入点和切面的线 -->
+		<aop:advisor advice-ref="logBefore" pointcut-ref="pointcut"/>
+		<aop:aspect></aop:aspect>
+	</aop:config>
+	
+	<aop:config>
+		<aop:pointcut expression="execution(public void org.ruangong.service.impl.StudentServiceImpl.addStudent(org.ruangong.entity.Student))" id="pointcut"/>
+		<aop:advisor advice-ref="logAfter" pointcut-ref="pointcut"/>
+	</aop:config>
+	
+	<aop:config>
+		<aop:pointcut expression="execution(public void org.ruangong.service.impl.StudentServiceImpl.addStudent(org.ruangong.entity.Student))" id="pointcut"/>
+		<aop:advisor advice-ref="logExecption" pointcut-ref="pointcut"/>
+	</aop:config>
+	
+	<aop:config>
+		<aop:pointcut expression="execution(public void org.ruangong.service.impl.StudentServiceImpl.addStudent(org.ruangong.entity.Student))" id="pointcut"/>
+		<aop:advisor advice-ref="logAround" pointcut-ref="pointcut"/>
+	</aop:config>
+	
+	
+	<!-- <bean id="studentDao" class="org.ruangong.dao.StudentDaoImpl"></bean> -->
+</beans>
